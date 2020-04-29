@@ -1,0 +1,2 @@
+gcc -c -o mido_tyh_wlog_int.o mido_tyh_wlog_int.c -I. -Wall
+gcc -o mido_tyh_wlog_int HTU21D.o mido_tyh_wlog_int.o -I. -Wall -lwiringPi
