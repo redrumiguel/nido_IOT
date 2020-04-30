@@ -48,7 +48,7 @@ ESTADO = POOLING
 today = date.today()
 ## Funcion del API serial para configurar el puerto serie
 ser = serial.Serial('/dev/ttyS0',baudrate = 9600, parity=serial.PARITY_NONE,
-                    stopbits=serial.STOPBITS_ONE,bytesize=serial.EIGHTBITS, timeout = 5)
+                    stopbits=serial.STOPBITS_ONE,bytesize=serial.EIGHTBITS, timeout = 5)  ## ver cuanto tiempo estan en tubo para entrar y variar timeout si necesario
 ser.close()
 						### Declaracion de funciones ###
 """ Funcion que permite leer el puerto serie del lector de transponder y elaborar y filtrar tramas para devolver una valida"""
@@ -279,7 +279,13 @@ while PROGRAMA_ACTIVO == True:
                         	id = "0000000000"
                         	print id
 				print bin(flagteiner)
+				if flagteiner >> 2 & 1 and flagteiner >> 1 & 1 == 0  and flagteiner >> 0 & 1:
+                                	print "flagsteiner "+ bin(flagteiner)
+                                	flagteiner = flagteiner & 0b1000
+                                	print "pulsacion erronea pulsador externo"
+                        	elif flagteiner >> 2 & 1 and flagteiner >> 1 & 1  and flagteiner >> 0 & 1 == 0:
+                                	flagteiner = flagteiner & 0b1000
+                                	print "pulsacion erronea pulsador interno"
 		ESTADO = POOLING
-
 print "Pajara capturado. Necesito Reset"
 						### Fin Maquina principal ###

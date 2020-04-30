@@ -1,3 +1,4 @@
+#!/usr/bin/python
 ##############################################################################################
 # Autor: Miguel Redruello Garcia
 # Version:
@@ -43,7 +44,7 @@ def get_datetime():
                 # get clock from internet
                 import ntplib
                 client = ntplib.NTPClient()
-                response = client.request('es.pool.ntp.org')
+                response = client.request('hora.rediris.es')
                 clock = time.strftime(time_format,time.localtime(response.tx_time))
                 date = time.strftime(date_format,time.localtime(response.tx_time))
                 print "sincronizado con ntp server"
@@ -71,13 +72,14 @@ print SSID
 print IP
 print "Sincronizando con NTP"
 hora = get_datetime()
+print "hora ="+hora[0]+" fecha= " +hora[1]
 
 try:
 	proc_set_hour = subprocess.Popen(["sudo","date","--set=" + hora[0]], stdout=subprocess.PIPE)
 	subprocess.Popen.wait(proc_set_hour)
-	print "Completada sincronizacion de hora"
+	print "Completada actualizacion de hora"
 except:
-	print "Error sincronizacion"
+	print "Error actualizacion"
 
 sys.stdout.write("0\n")
 
