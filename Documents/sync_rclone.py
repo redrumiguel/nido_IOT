@@ -14,6 +14,8 @@ import subprocess
 from datetime import date
 import time
 import sys
+import os.path
+from os import path
 					  ### Definicion de funciones ###
 def leer_file():
 	### Variables locales ###
@@ -32,24 +34,26 @@ def leer_file():
 	file1.close()
 	for i, item in enumerate(lineas,0):
 		lineas[i] = lineas[i].split(",")
-		proc.append(subprocess.Popen(["rclone", "copy", lineas[i][0], "drive:Nido1/20"+lineas[i][1][6:8]+ "/" + lineas[i][1][3:5]+"/"+lineas[i][1][0:2]], stdout=subprocess.PIPE))
-    		resp= proc[i].communicate()
-		proc[i].wait()
-		print lineas[i][0]
-		if proc[i].returncode != 0:
-			escrbir = lineas[i][0]+","+lineas[i][1]
-			print "error en " +  escrbir
-			try:
-				file2 = open("rclone_copy.txt","a")
-			except:
-				file2.close()
-                		sys.exit("Error al abrir archivo")
-			file2.write(escrbir)
-			file2.close()
+		if path.exists(lineas[i][0]):
+			proc.append(subprocess.Popen(["rclone", "copy", lineas[i][0], "drive:Nido1/20"+lineas[i][1][6:8]+ "/" + lineas[i][1][3:5]+"/"+lineas[i][1][0:2]], stdout=subprocess.PIPE))
+    			resp= proc[i].communicate()
+			proc[i].wait()
+			print lineas[i][0]
+			if proc[i].returncode != 0:
+				escrbir = lineas[i][0]+","+lineas[i][1]
+				print "error en " +  escrbir
+				try:
+					file2 = open("rclone_copy.txt","a")
+					file2.write(escrbir)
+                                	file2.close()
+				except:
+					file2.close()
+                			sys.exit("Error al abrir archivo")
+			else:
+				proc_rm_2 = subprocess.Popen(["sudo", "rm", lineas[i][0]], stdout=subprocess.PIPE)
+				print "borrar"
 		else:
-			proc_rm_2 = subprocess.Popen(["sudo", "rm", lineas[i][0]], stdout=subprocess.PIPE)
-			print "borrar"
-
+			print "El archivo no existe a enviar no exite"
 					### Incio Script ###
 leer_file()
 					### Fin Script ###

@@ -66,7 +66,7 @@ while SSID != mySSID or IP == myIP:
 		IP = get_IP()
         	reintentos = reintentos + 1
 	else:
-	        sys.exit(1)
+	        sys.exit(-1)
 
 print SSID
 print IP
