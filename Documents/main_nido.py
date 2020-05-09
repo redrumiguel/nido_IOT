@@ -45,7 +45,6 @@ NIDO = "1"
 GPIO.setup(PIN_FUERA, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(PIN_DENTRO, GPIO.IN, pull_up_down=GPIO.PUD_UP) # Button pin set as input w/ pull-up
 ESTADO = POOLING
-today = date.today()
 ## Funcion del API serial para configurar el puerto serie
 ser = serial.Serial('/dev/ttyS0',baudrate = 9600, parity=serial.PARITY_NONE,
                     stopbits=serial.STOPBITS_ONE,bytesize=serial.EIGHTBITS, timeout = 5)  ## ver cuanto tiempo estan en tubo para entrar y variar timeout si necesario
@@ -264,6 +263,7 @@ while PROGRAMA_ACTIVO == True:
 		print "estado lectura"
 		trama_leida = lee_trama()
        			 ## guardo la informacion de hora fecha e id del pajaro en file
+		today = date.today()
 		fecha = today.strftime("%d-%m-%y")
 		hora = time.strftime("%H:%M:%S") 
 		print "flagteiner: "

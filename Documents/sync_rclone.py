@@ -21,6 +21,7 @@ def leer_file():
 	### Variables locales ###
 	today = date.today()
 	fecha = today.strftime("%d-%m-%y")
+	hora = time.strftime("%H:%M") 
 	proc = []
 	linea = []
 	try:
@@ -50,8 +51,13 @@ def leer_file():
 					file2.close()
                 			sys.exit("Error al abrir archivo")
 			else:
-				proc_rm_2 = subprocess.Popen(["sudo", "rm", lineas[i][0]], stdout=subprocess.PIPE)
-				print "borrar"
+				if hora == "23:59":
+					proc_rm_2 = subprocess.Popen(["sudo", "rm", lineas[i][0]], stdout=subprocess.PIPE)
+					print "borrar"
+				else:
+					file_name, file_extension = os.path.splitext(lineas[i][0])
+					if file_extension != ".txt":
+						proc_rm_3 = subprocess.Popen(["sudo", "rm", lineas[i][0]], stdout=subprocess.PIPE)
 		else:
 			print "El archivo no existe a enviar no exite"
 					### Incio Script ###
