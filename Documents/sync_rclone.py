@@ -56,7 +56,10 @@ def leer_file():
 					print "borrar"
 				else:
 					file_name, file_extension = os.path.splitext(lineas[i][0])
-					if file_extension != ".txt":
+					proc_date_lastmod = subprocess.Popen(["date", "+%d-%m-%y", "-r", lineas[i][0]], stdout=subprocess.PIPE)
+			        	output_fecha,errno_fecha = proc_date_lastmod.communicate()
+					fecha_last = output_fecha[0:len(output_fecha)-1].replace("/","-") ## cambio de / por - en el formato
+					if file_extension != ".txt" or fecha_last != fecha:
 						proc_rm_3 = subprocess.Popen(["sudo", "rm", lineas[i][0]], stdout=subprocess.PIPE)
 		else:
 			print "El archivo no existe a enviar no exite"
