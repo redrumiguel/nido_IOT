@@ -1,20 +1,20 @@
-"""
+#!/usr/bin/python
 ############################################################################################################################
-File: set_cola.py
-Autor: Miguel Redruello Garcia
-Fecha: 29-03-20
-Version:
-Descripcion: Script que permite encolar archivos que recibe por parametros [python set_cola.py <archivo a encolar>].
-	     Para ello, lo busca en primer luegar, para conocer su PATH completo y si existe, lo adjunta junto con la fecha 
-	     de modificacion en un archivo txt.
-	     Este archivo sera despues utilizador por el script sync_rclone.py para enviarlos a la cuenta de drive asocialda 
+# File: set_cola.py
+# Autor: Miguel Redruello Garcia
+# Fecha: 29-03-20
+# Version:
+# Descripcion: Script que permite encolar archivos que recibe por parametros [python set_cola.py <archivo a encolar>].
+#	     Para ello, lo busca en primer luegar, para conocer su PATH completo y si existe, lo adjunta junto con la fecha 
+#	     de modificacion en un archivo txt.
+#	     Este archivo sera despues utilizador por el script sync_rclone.py para enviarlos a la cuenta de drive asocialda 
 ############################################################################################################################
-"""
+
 import subprocess
 import sys
 					### Definicion de funciones ###
 def grabar_file(name_file):
-	proc_find = subprocess.Popen(["sudo", "find", "/home/pi", "-name", name_file], stdout=subprocess.PIPE)
+	proc_find = subprocess.Popen(["sudo", "find", "/home/pi", "-iname", name_file], stdout=subprocess.PIPE)
 	output,errno = proc_find.communicate()
 	if (output != ""):
 		file2 = open("rclone_copy.txt","a") #Archivo a crear /abir para intruducir el archivo a encolar

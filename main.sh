@@ -6,7 +6,8 @@
 # Fecha: 29-04-20
 # Descripcion: Script que permite lanzar el programa principal ejecutado por crontab
 ###############################################################################################
-sudo python /home/pi/desWifi.py
+#sudo python /home/pi/desWifi.py
+./actWifi.py
 
 cd Documents
 

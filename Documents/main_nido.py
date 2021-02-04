@@ -31,6 +31,7 @@ GPIO.setmode(GPIO.BCM)
 ## Pines asociados a las interrupciones de los pulsadores
 PIN_FUERA = 5
 PIN_DENTRO = 12
+PIN_RFID = 27
 ## Estados  maquina principal
 POOLING = 0b00
 LECTURA = 0b01
@@ -42,6 +43,7 @@ flagteiner = 0b0000  #variable encargada de monitorizar estados pulsadores(dos p
 capturado = False
 pool = True
 NIDO = "1"
+GPIO.setup(PIN_RFID, GPIO.OUT)
 GPIO.setup(PIN_FUERA, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(PIN_DENTRO, GPIO.IN, pull_up_down=GPIO.PUD_UP) # Button pin set as input w/ pull-up
 ESTADO = POOLING
@@ -261,7 +263,9 @@ while PROGRAMA_ACTIVO == True:
 			pool = False
     	elif ESTADO == LECTURA:
 		print "estado lectura"
+		GPIO.output(PIN_RFID, GPIO.HIGH)
 		trama_leida = lee_trama()
+		GPIO.output(PIN_RFID, GPIO.LOW)
        			 ## guardo la informacion de hora fecha e id del pajaro en file
 		today = date.today()
 		fecha = today.strftime("%d-%m-%y")

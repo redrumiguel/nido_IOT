@@ -28,6 +28,7 @@ def leer_file():
         	file1 = open("rclone_copy.txt","r+")
 	except:
 		file1.close()
+#		print "excepcion"
 		sys.exit("no exite el archivo")
         lineas = file1.readlines()
 	proc_rm = subprocess.Popen(["sudo", "rm", "./rclone_copy.txt"], stdout=subprocess.PIPE)
@@ -35,6 +36,7 @@ def leer_file():
 	file1.close()
 	for i, item in enumerate(lineas,0):
 		lineas[i] = lineas[i].split(",")
+		print lineas[i]
 		if path.exists(lineas[i][0]):
 			proc.append(subprocess.Popen(["rclone", "copy", lineas[i][0], "drive:Nido1/20"+lineas[i][1][6:8]+ "/" + lineas[i][1][3:5]+"/"+lineas[i][1][0:2]], stdout=subprocess.PIPE))
     			resp= proc[i].communicate()
@@ -42,7 +44,7 @@ def leer_file():
 			print lineas[i][0]
 			if proc[i].returncode != 0:
 				escrbir = lineas[i][0]+","+lineas[i][1]
-				print "error en " +  escrbir
+				print ("error en " +  escrbir)
 				try:
 					file2 = open("rclone_copy.txt","a")
 					file2.write(escrbir)
@@ -53,7 +55,7 @@ def leer_file():
 			else:
 				if hora == "23:59":
 					proc_rm_2 = subprocess.Popen(["sudo", "rm", lineas[i][0]], stdout=subprocess.PIPE)
-					print "borrar"
+					#print "borrar"
 				else:
 					file_name, file_extension = os.path.splitext(lineas[i][0])
 					proc_date_lastmod = subprocess.Popen(["date", "+%d-%m-%y", "-r", lineas[i][0]], stdout=subprocess.PIPE)
@@ -62,7 +64,7 @@ def leer_file():
 					if file_extension != ".txt" or fecha_last != fecha:
 						proc_rm_3 = subprocess.Popen(["sudo", "rm", lineas[i][0]], stdout=subprocess.PIPE)
 		else:
-			print "El archivo no existe a enviar no exite"
+			print ("El archivo no existe a enviar no exite")
 					### Incio Script ###
 leer_file()
 					### Fin Script ###

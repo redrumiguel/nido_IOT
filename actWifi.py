@@ -19,8 +19,10 @@ proc_unblock_wlan0 = subprocess.Popen(["sudo","rfkill","unblock","0"], stdout=su
 proc_wlna_ena = subprocess.Popen(["sudo","ifconfig","wlan0","up"], stdout=subprocess.PIPE)
 
 			## Declaracion de variables globales del script ##
+#mySSID = "nestbox" + '\n'
 mySSID = "Mi_casa_2.4" + '\n'
-myIP = "127.0.0.1" + '\n'
+#myIP = "127.0.0.1" + '\n'
+myIP = "192.168.1.51" + '\n'
 SSID = " "
 IP = " "
 			## Declaracion de funciones del script ##
@@ -65,6 +67,7 @@ while SSID != mySSID or IP == myIP:
 		SSID = get_ssid()
 		IP = get_IP()
         	reintentos = reintentos + 1
+		print "."
 	else:
 	        sys.exit(-1)
 
