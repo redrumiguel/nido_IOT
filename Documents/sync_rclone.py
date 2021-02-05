@@ -16,6 +16,10 @@ import time
 import sys
 import os.path
 from os import path
+import logging
+FORMATO = '%(asctime)s - %(levelname)s - %(script)s - %(message)s'
+logging.basicConfig(filename='/home/pi/Nido_IoT.log', filemode='a', level=logging.DEBUG, format=FORMATO, datefmt='%m/%d/%Y %H:%M:%S')
+
 					  ### Definicion de funciones ###
 def leer_file():
 	### Variables locales ###
@@ -24,12 +28,14 @@ def leer_file():
 	hora = time.strftime("%H:%M") 
 	proc = []
 	linea = []
+	d = {'script':'sync_rclone.py'}
 	try:
         	file1 = open("rclone_copy.txt","r+")
 	except:
 		file1.close()
 #		print "excepcion"
 		sys.exit("no exite el archivo")
+		logging.error('Could\'n open rclone_copy.txt',extra=d)
         lineas = file1.readlines()
 	proc_rm = subprocess.Popen(["sudo", "rm", "./rclone_copy.txt"], stdout=subprocess.PIPE)
 	file1.seek(0)
@@ -39,6 +45,7 @@ def leer_file():
 		print lineas[i]
 		if path.exists(lineas[i][0]):
 			proc.append(subprocess.Popen(["rclone", "copy", lineas[i][0], "drive:Nido1/20"+lineas[i][1][6:8]+ "/" + lineas[i][1][3:5]+"/"+lineas[i][1][0:2]], stdout=subprocess.PIPE))
+			logging.info('Copied into Cloud - {0}'.format(lineas[i][0]), extra = d)
     			resp= proc[i].communicate()
 			proc[i].wait()
 			print lineas[i][0]
@@ -65,6 +72,7 @@ def leer_file():
 						proc_rm_3 = subprocess.Popen(["sudo", "rm", lineas[i][0]], stdout=subprocess.PIPE)
 		else:
 			print ("El archivo no existe a enviar no exite")
+			logging.warning("File dosn\'n exist anymore - {0}".format(lineas[i][0]), extra=d)
 					### Incio Script ###
 leer_file()
 					### Fin Script ###

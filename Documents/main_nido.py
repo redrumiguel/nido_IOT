@@ -26,6 +26,10 @@ import RPi.GPIO as GPIO
 from datetime import date
 from time import sleep
 import subprocess
+import logging
+FORMATO = '%(asctime)s - %(levelname)s - %(script)s - %(message)s'
+logging.basicConfig(filename='/home/pi/Nido_IoT.log', filemode='a', level=logging.DEBUG, format=FORMATO, datefmt='%m/%d/%Y %H:%M:%S')
+d = {'script':'main_nido.py'}
 
 GPIO.setmode(GPIO.BCM)
 ## Pines asociados a las interrupciones de los pulsadores
@@ -84,6 +88,7 @@ def lee_trama():
 							       ## accidentales
 					acabado = True
 					trama = "no valida"
+					logging.warning("No valid data", extra=d)
 					return trama
                 	trama = dato
                 	dato = b'\x00\x00'
@@ -158,12 +163,14 @@ def button_ext(channel):
 			ser.close()
 		except serial.SerialException:
 			print "cant close port"
+			logging.warning("Serial port can\'t be closed", extra=d)
 	else:
 		flagteiner = flagteiner | 0b0001 
 		try:
                         ser.open()
                 except serial.SerialException:
                         print "cant open port"
+			logging.warning("Serial port can\'t be opened", extra=d)
 	print "inter ext:"
 	print bin(flagteiner)
         ESTADO = POOLING
@@ -178,6 +185,7 @@ def button_int(channel):
                         ser.close()
                 except serial.SerialException:
                         print "cant close port"
+			logging.warning("Serial port can\'t be closed", extra=d)
         else:
                 flagteiner = flagteiner | 0b0010
 		if flagteiner >> 0 & 1 == 0:
@@ -186,6 +194,7 @@ def button_int(channel):
                         ser.open()
                 except serial.SerialException:
                         print "cant open port"
+			logging.warning("Serial port can\'t be opened", extra=d)
 	print "inter int:"
         print bin(flagteiner)
         ESTADO = POOLING
@@ -205,6 +214,7 @@ while PROGRAMA_ACTIVO == True:
                			## analizo y tomo una accion
 				if leer_file(id):
 					capturado = True
+					logging.info('Captured', extra = d)
 					print "PAJARO ID CAPTURADO"
 					GPIO.remove_event_detect(PIN_DENTRO)
                                         GPIO.remove_event_detect(PIN_FUERA)
@@ -241,6 +251,7 @@ while PROGRAMA_ACTIVO == True:
                                 flagteiner = flagteiner | 0b1000
 				escribo_file(capturado, flagteiner >> 3 & 1)
 			elif flagteiner == 0b0000:
+				logging.info('tried to get in but left', extra = d)
                                 #esta entrando
 				print flagteiner
                                 print "0b0000 piso 1 sw pero se fue"
@@ -249,16 +260,20 @@ while PROGRAMA_ACTIVO == True:
                			ESTADO = LECTURA
 				flagteiner = flagteiner & 0b0011
 				print "0b0001 entrando"
+				logging.info('getting in', extra = d)
             		elif flagteiner >> 3 & 1  and flagteiner >> 1 & 1 and flagteiner >> 0 & 1 == 0:
                 		#saliendo del nido
 				print "0b1010 saliendo del nido sw interior"
+				logging.info('getting out', extra = d)
 				ESTADO = LECTURA
 			elif flagteiner >> 3 & 1  and flagteiner >> 1 & 1 and flagteiner >> 0 & 1 == 1:
 				print "0b1x11 ha salido "
+				logging.info('Left', extra = d)
 				escribo_file(capturado,0b0)
                                 flagteiner = 0b0000
             		elif flagteiner >> 3 & 1  and flagteiner >> 1 & 1 == 0 and flagteiner >> 0 & 1 == 0:
 				print "0b1x00 volvio a entrar"
+				logging.info('tried to leeve but stayed', extra = d)
 				time.sleep(0.3)
 			pool = False
     	elif ESTADO == LECTURA:

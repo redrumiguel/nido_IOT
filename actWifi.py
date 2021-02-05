@@ -13,6 +13,8 @@ from time import sleep
 import socket
 import sys
 import time
+import logging
+d = {'script':'actWifi.py'}
 
 proc_unblock_wlan0 = subprocess.Popen(["sudo","rfkill","unblock","0"], stdout=subprocess.PIPE)
 
@@ -24,6 +26,7 @@ mySSID = "Mi_casa_2.4" + '\n'
 #myIP = "127.0.0.1" + '\n'
 myIP = "192.168.1.51" + '\n'
 SSID = " "
+logging.basicConfig(filename='/home/pi/Nido_IoT.log', filemode='a', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(script)s - %(message)s', datefmt='%m/%d/%Y %H:%M:%S')
 IP = " "
 			## Declaracion de funciones del script ##
 def get_ssid():
@@ -50,16 +53,19 @@ def get_datetime():
                 clock = time.strftime(time_format,time.localtime(response.tx_time))
                 date = time.strftime(date_format,time.localtime(response.tx_time))
                 print "sincronizado con ntp server"
+		logging.info('Date&Time NTP update', extra=d)
         except:
                 # if internet if not available, get clock from host
                 import datetime
                 clock = datetime.datetime.now().strftime(time_format)
                 date = datetime.datetime.now().strftime(date_format)
                 print "hora del host"
+		logging.warning('Date&Time host update', extra=d)
         return clock, date
 
 				## Inicio del programa ##
 print "wifi ON"
+logging.debug('Wifi Connection started', extra=d)
 reintentos = 0
 while SSID != mySSID or IP == myIP:
 	if reintentos < 10:
@@ -70,7 +76,7 @@ while SSID != mySSID or IP == myIP:
 		print "."
 	else:
 	        sys.exit(-1)
-
+		logging.error('Failed to conenect to wifi')
 print SSID
 print IP
 print "Sincronizando con NTP"
@@ -81,6 +87,7 @@ try:
 	proc_set_hour = subprocess.Popen(["sudo","date","--set=" + hora[0]], stdout=subprocess.PIPE)
 	subprocess.Popen.wait(proc_set_hour)
 	print "Completada actualizacion de hora"
+	logging.debug('Date&Time updated', extra=d)
 except:
 	print "Error actualizacion"
 

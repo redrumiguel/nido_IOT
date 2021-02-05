@@ -12,12 +12,18 @@
 
 import subprocess
 import sys
+import logging
+FORMATO = '%(asctime)s - %(levelname)s - %(script)s - %(message)s - %(file)s '
+d = {'script':'set_cola.py', 'file': sys.argv[1]}
+logging.basicConfig(filename='/home/pi/Nido_IoT.log', filemode='a', level=logging.DEBUG, format=FORMATO, datefmt='%m/%d/%Y %H:%M:%S')
+
 					### Definicion de funciones ###
 def grabar_file(name_file):
+	logging.info('set into the out buffer', extra=d)
 	proc_find = subprocess.Popen(["sudo", "find", "/home/pi", "-iname", name_file], stdout=subprocess.PIPE)
 	output,errno = proc_find.communicate()
 	if (output != ""):
-		file2 = open("rclone_copy.txt","a") #Archivo a crear /abir para intruducir el archivo a encolar
+		file2 = open("/home/pi/Documents/rclone_copy.txt","a") #Archivo a crear /abir para intruducir el archivo a encolar
 		file2.write(output[0:len(output)-1])
 		file2.write(",")
 		proc_date_lastmod = subprocess.Popen(["date", "+%d-%m-%y", "-r", output[0:len(output)-1]], stdout=subprocess.PIPE)
@@ -28,6 +34,7 @@ def grabar_file(name_file):
 		file2.close()
 	else:
 		print "no existe el archivo"
+		logging.warning('file coudn\'t be found', extra=d)
 						### Inicio Script ###
 print sys.argv[1]
 grabar_file(sys.argv[1])
