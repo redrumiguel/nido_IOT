@@ -8,7 +8,7 @@
 #		ser encolados y por tanto no disponibles en cloud
 ###############################################################################################
 
-find /home/pi/ -name 'temp*' | while read a;do sudo /home/pi/Documents/set_cola.py $(basename $a);done
-find /home/pi/ -name 'Mov*' | while read a;do sudo /home/pi/Documents/set_cola.py $(basename $a);done
-find /home/pi/ -name '*.h264' | while read a;do sudo /home/pi/Documents/set_cola.py $(basename $a);done
-find /home/pi/ -name '*.jpg' | while read a;do sudo /home/pi/Documents/set_cola.py $(basename $a);done
+find /home/pi/ -name 'temp*' | while read a;do /home/pi/Documents/set_cola.py $(basename $a);done
+find /home/pi/ -name 'Mov*' | while read a;do  /home/pi/Documents/set_cola.py $(basename $a);done
+find /home/pi/ -name '*.h264' | while read a;do /home/pi/Documents/set_cola.py $(basename $a);done
+find /home/pi/ -name '*.jpg' | while read a;do /home/pi/Documents/set_cola.py $(basename $a);done

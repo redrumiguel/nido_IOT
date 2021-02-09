@@ -37,7 +37,8 @@ def leer_file():
 		sys.exit("no exite el archivo")
 		logging.error('Could\'n open rclone_copy.txt',extra=d)
         lineas = file1.readlines()
-	proc_rm = subprocess.Popen(["sudo", "rm", "./rclone_copy.txt"], stdout=subprocess.PIPE)
+	proc_rm = subprocess.Popen(["rm", "./rclone_copy.txt"], stdout=subprocess.PIPE)
+#	proc_rm = subprocess.Popen(["sudo", "rm", "./rclone_copy.txt"], stdout=subprocess.PIPE)
 	file1.seek(0)
 	file1.close()
 	for i, item in enumerate(lineas,0):
@@ -61,17 +62,20 @@ def leer_file():
                 			sys.exit("Error al abrir archivo")
 			else:
 				if hora == "23:59":
-					proc_rm_2 = subprocess.Popen(["sudo", "rm", lineas[i][0]], stdout=subprocess.PIPE)
+					proc_rm_2 = subprocess.Popen(["rm", lineas[i][0]], stdout=subprocess.PIPE)
+					#proc_rm_2 = subprocess.Popen(["sudo", "rm", lineas[i][0]], stdout=subprocess.PIPE)
 					#print "borrar"
+					logging.info("File removed - time:  {0}".format(hora), extra=d)
 				else:
 					file_name, file_extension = os.path.splitext(lineas[i][0])
 					proc_date_lastmod = subprocess.Popen(["date", "+%d-%m-%y", "-r", lineas[i][0]], stdout=subprocess.PIPE)
 			        	output_fecha,errno_fecha = proc_date_lastmod.communicate()
 					fecha_last = output_fecha[0:len(output_fecha)-1].replace("/","-") ## cambio de / por - en el formato
-					if file_extension != ".txt" or fecha_last != fecha:
-						proc_rm_3 = subprocess.Popen(["sudo", "rm", lineas[i][0]], stdout=subprocess.PIPE)
+					if (file_extension != '.txt' and  file_extension != '.log') or fecha_last != fecha:
+						logging.info("File removed - extension: {0}".format(file_extension), extra=d)
+						proc_rm_3 = subprocess.Popen(["rm", lineas[i][0]], stdout=subprocess.PIPE)
 		else:
-			print ("El archivo no existe a enviar no exite")
+			print ("El archivo a enviar no exite")
 			logging.warning("File dosn\'n exist anymore - {0}".format(lineas[i][0]), extra=d)
 					### Incio Script ###
 leer_file()

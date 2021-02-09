@@ -2,8 +2,8 @@
 ##############################################################################################
 # File:  main.nido.py
 # Autor: Miguel Redruello Garcia
-# Version:
-# Fecha: 29-03-20
+# Version:V 1.1
+# Fecha: 06-02-21
 # Descripcion: Programa principal del proyector para la monitorizacion de aves. Esta aplicacion
 #	       permite la gestion de dos pulsadores con los cuales se detecta la entrada o sali-
 #	       da de las aves al nido. Una vez que uno de ellos es pulsado se activa el lector
@@ -25,16 +25,25 @@ import os, time
 import RPi.GPIO as GPIO
 from datetime import date
 from time import sleep
+from servo import *
+from infrared import *
 import subprocess
+## Metodos para realizar registros de Logs
 import logging
 FORMATO = '%(asctime)s - %(levelname)s - %(script)s - %(message)s'
 logging.basicConfig(filename='/home/pi/Nido_IoT.log', filemode='a', level=logging.DEBUG, format=FORMATO, datefmt='%m/%d/%Y %H:%M:%S')
 d = {'script':'main_nido.py'}
 
 GPIO.setmode(GPIO.BCM)
+## Pin infrarrojo
+PIN_ENA_INFRARED = 21
+## Pines para el servo
+PIN_ENA_SERVO = 6
+SERVO = 7
 ## Pines asociados a las interrupciones de los pulsadores
 PIN_FUERA = 5
 PIN_DENTRO = 12
+## Pin habilitar lector RFID.
 PIN_RFID = 27
 ## Estados  maquina principal
 POOLING = 0b00
@@ -55,6 +64,9 @@ ESTADO = POOLING
 ser = serial.Serial('/dev/ttyS0',baudrate = 9600, parity=serial.PARITY_NONE,
                     stopbits=serial.STOPBITS_ONE,bytesize=serial.EIGHTBITS, timeout = 5)  ## ver cuanto tiempo estan en tubo para entrar y variar timeout si necesario
 ser.close()
+servo_init(PIN_ENA_SERVO,SERVO)
+infrared_init(PIN_ENA_INFRARED)
+
 						### Declaracion de funciones ###
 """ Funcion que permite leer el puerto serie del lector de transponder y elaborar y filtrar tramas para devolver una valida"""
 def lee_trama():
@@ -159,18 +171,8 @@ def button_ext(channel):
         print("Button exterior pressed!")
 	if flagteiner >> 0 & 1:
         	flagteiner = flagteiner & 0b1110
-		try:
-			ser.close()
-		except serial.SerialException:
-			print "cant close port"
-			logging.warning("Serial port can\'t be closed", extra=d)
 	else:
-		flagteiner = flagteiner | 0b0001 
-		try:
-                        ser.open()
-                except serial.SerialException:
-                        print "cant open port"
-			logging.warning("Serial port can\'t be opened", extra=d)
+		flagteiner = flagteiner | 0b0001
 	print "inter ext:"
 	print bin(flagteiner)
         ESTADO = POOLING
@@ -181,20 +183,10 @@ def button_int(channel):
         print "Button interior pressed"
 	if flagteiner >> 1 & 1:
                 flagteiner = flagteiner & 0b1101
-		try:
-                        ser.close()
-                except serial.SerialException:
-                        print "cant close port"
-			logging.warning("Serial port can\'t be closed", extra=d)
         else:
                 flagteiner = flagteiner | 0b0010
 		if flagteiner >> 0 & 1 == 0:
                         flagteiner = flagteiner | 0b1000
-		try:
-                        ser.open()
-                except serial.SerialException:
-                        print "cant open port"
-			logging.warning("Serial port can\'t be opened", extra=d)
 	print "inter int:"
         print bin(flagteiner)
         ESTADO = POOLING
@@ -218,31 +210,34 @@ while PROGRAMA_ACTIVO == True:
 					print "PAJARO ID CAPTURADO"
 					GPIO.remove_event_detect(PIN_DENTRO)
                                         GPIO.remove_event_detect(PIN_FUERA)
+					release_trap(PIN_ENA_SERVO,SERVO)
 					##capturo pajaro
 					#grabo video
+					infrared_on(PIN_ENA_INFRARED)
 					proc_record_video = subprocess.Popen(["raspivid", "-t", "10000","-w","640","-h","480","-o",id + "-" + fecha + "-"+ hora +".h264"], stdout=subprocess.PIPE)
                                         proc_record_video.wait()
+					infrared_off(PIN_ENA_INFRARED)
                                         print "viedo done"
-                                       # o = subprocess.Popen(["sudo", "./video.sh"], stdout=subprocess.PIPE)
-                                        proc_set_cola = subprocess.Popen(["sudo", "python", "/home/pi/Documents/set_cola.py", id + "-" + fecha + "-"+ hora +".h264"], stdout=subprocess.PIPE)
+                                       # o = subprocess.Popen([""./video.sh"], stdout=subprocess.PIPE)
+                                        proc_set_cola = subprocess.Popen(["/home/pi/Documents/set_cola.py", id + "-" + fecha + "-"+ hora +".h264"], stdout=subprocess.PIPE)
 					proc_set_cola.wait()
                                         print "set_cola done"
 					#arranco wifi
-					proc_actWifi = subprocess.Popen(["sudo", "python", "/home/pi/actWifi.py"], stdout=subprocess.PIPE)
-					proc_actWifi.wait()
-                                        if proc_actWifi.returncode != 0:
-                                        	print "No ha sido posible conectarse a la red"
-                                        else:
+					PROGRAMA_ACTIVO = False
+#					proc_actWifi = subprocess.Popen(["/home/pi/actWifi.py"], stdout=subprocess.PIPE)
+#					proc_actWifi.wait()
+#                                        if proc_actWifi.returncode != 0:
+#                                        	print "No ha sido posible conectarse a la red"
+#                                        else:
                                         	#envio mail
-                                                print "wifi activo"
-                                                proc_mail = subprocess.Popen(["sudo", "python", "/home/pi/Documents/mail.py", NIDO, str(id)], stdout=subprocess.PIPE)
-                                                proc_mail.wait()
+#                                                print "wifi activo"
+#                                                proc_mail = subprocess.Popen(["/home/pi/Documents/mail.py", NIDO, str(id)], stdout=subprocess.PIPE)
+ #                                               proc_mail.wait()
                                                 #apago wifi
-                                                print "mail sent"
-#                                                proc_dis_wifi = subprocess.Popen(["sudo", "python", "/home/pi/desWifi.py"], stdout=subprocess.PIPE)
+#                                                print "mail sent"
+#                                                proc_dis_wifi = subprocess.Popen(["/home/pi/desWifi.py"], stdout=subprocess.PIPE)
  #                                               proc_dis_wifi.wait()
-  #                                              print "des wifi"
-                                        PROGRAMA_ACTIVO = False
+  #                                              print "des wifi" """
 				#else:
 					#otras acciones
 				time.sleep(0.3)
@@ -278,8 +273,22 @@ while PROGRAMA_ACTIVO == True:
 			pool = False
     	elif ESTADO == LECTURA:
 		print "estado lectura"
+		## Habilito lector RFID
 		GPIO.output(PIN_RFID, GPIO.HIGH)
+		## Habilito puerto serie
+		try:
+                        ser.open()
+                except serial.SerialException:
+                        print "cant open port"
+                        logging.warning("Serial port can\'t opened", extra=d)
 		trama_leida = lee_trama()
+		## Deshabilito puerto serie
+		try:
+                        ser.close()
+                except serial.SerialException:
+                        print "cant close port"
+                        logging.warning("Serial port can\'t be closed", extra=d)
+		## Deshabilito lector RFID para ahorro de energia.
 		GPIO.output(PIN_RFID, GPIO.LOW)
        			 ## guardo la informacion de hora fecha e id del pajaro en file
 		today = date.today()

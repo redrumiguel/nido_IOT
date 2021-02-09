@@ -20,7 +20,8 @@ logging.basicConfig(filename='/home/pi/Nido_IoT.log', filemode='a', level=loggin
 					### Definicion de funciones ###
 def grabar_file(name_file):
 	logging.info('set into the out buffer', extra=d)
-	proc_find = subprocess.Popen(["sudo", "find", "/home/pi", "-iname", name_file], stdout=subprocess.PIPE)
+	#proc_find = subprocess.Popen(["sudo", "find", "/home/pi", "-iname", name_file], stdout=subprocess.PIPE)
+	proc_find = subprocess.Popen(["find", "/home/pi", "-iname", name_file], stdout=subprocess.PIPE)
 	output,errno = proc_find.communicate()
 	if (output != ""):
 		file2 = open("/home/pi/Documents/rclone_copy.txt","a") #Archivo a crear /abir para intruducir el archivo a encolar
