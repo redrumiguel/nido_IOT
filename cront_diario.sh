@@ -20,7 +20,7 @@ DATE_T=$(date +"%d-%m-%Y")
 ./set_cola.py $DATE.jpg
 ./set_cola.py "temperaturas-"$DATE_T.txt
 ./set_cola.py "Movimientos_nido1-"$DATE.txt
-./set_cola.py Nido_IoT.log
+./set_cola.py "Nido_IoT_"$DATE.log
 sudo chmod 666 /home/pi/Documents/rclone_copy.txt
 #crontab -l > crontab.crtb
 ../actWifi.py

@@ -25,21 +25,21 @@ import os, time
 import RPi.GPIO as GPIO
 from datetime import date
 from time import sleep
-from servo import *
+from eleciman import *
 from infrared import *
+from datetime import datetime
 import subprocess
 ## Metodos para realizar registros de Logs
 import logging
 FORMATO = '%(asctime)s - %(levelname)s - %(script)s - %(message)s'
-logging.basicConfig(filename='/home/pi/Nido_IoT.log', filemode='a', level=logging.DEBUG, format=FORMATO, datefmt='%m/%d/%Y %H:%M:%S')
+logging.basicConfig(filename='/home/pi/Nido_IoT_'+datetime.now().strftime('%d-%m-%y.log'), filemode='a', level=logging.DEBUG, format=FORMATO, datefmt='%m/%d/%Y %H:%M:%S')
 d = {'script':'main_nido.py'}
 
 GPIO.setmode(GPIO.BCM)
 ## Pin infrarrojo
 PIN_ENA_INFRARED = 21
-## Pines para el servo
-PIN_ENA_SERVO = 6
-SERVO = 7
+## Pines para el electroiman
+PIN_ENA_ELECIMAN = 6
 ## Pines asociados a las interrupciones de los pulsadores
 PIN_FUERA = 5
 PIN_DENTRO = 12
@@ -64,9 +64,7 @@ ESTADO = POOLING
 ser = serial.Serial('/dev/ttyS0',baudrate = 9600, parity=serial.PARITY_NONE,
                     stopbits=serial.STOPBITS_ONE,bytesize=serial.EIGHTBITS, timeout = 5)  ## ver cuanto tiempo estan en tubo para entrar y variar timeout si necesario
 ser.close()
-servo_init(PIN_ENA_SERVO,SERVO)
 infrared_init(PIN_ENA_INFRARED)
-
 						### Declaracion de funciones ###
 """ Funcion que permite leer el puerto serie del lector de transponder y elaborar y filtrar tramas para devolver una valida"""
 def lee_trama():
@@ -210,8 +208,11 @@ while PROGRAMA_ACTIVO == True:
 					print "PAJARO ID CAPTURADO"
 					GPIO.remove_event_detect(PIN_DENTRO)
                                         GPIO.remove_event_detect(PIN_FUERA)
-					release_trap(PIN_ENA_SERVO,SERVO)
 					##capturo pajaro
+					eleciman_init(PIN_ENA_ELECIMAN)
+					eleciman_on(PIN_ENA_ELECIMAN)
+					time.sleep(0.5)
+					eleciman_off(PIN_ENA_ELECIMAN)
 					#grabo video
 					infrared_on(PIN_ENA_INFRARED)
 					proc_record_video = subprocess.Popen(["raspivid", "-t", "10000","-w","640","-h","480","-o",id + "-" + fecha + "-"+ hora +".h264"], stdout=subprocess.PIPE)

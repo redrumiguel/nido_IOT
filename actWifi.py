@@ -14,6 +14,7 @@ import socket
 import sys
 import time
 import logging
+from datetime import datetime
 d = {'script':'actWifi.py'}
 
 proc_unblock_wlan0 = subprocess.Popen(["sudo","rfkill","unblock","0"], stdout=subprocess.PIPE)
@@ -23,10 +24,11 @@ proc_wlna_ena = subprocess.Popen(["sudo","ifconfig","wlan0","up"], stdout=subpro
 			## Declaracion de variables globales del script ##
 #mySSID = "nestbox" + '\n'
 mySSID = "Mi_casa_2.4" + '\n'
+#mySSID = "i2a2-INSTRUMENT" + '\n'
 #myIP = "127.0.0.1" + '\n'
 myIP = "192.168.1.51" + '\n'
 SSID = " "
-logging.basicConfig(filename='/home/pi/Nido_IoT.log', filemode='a', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(script)s - %(message)s', datefmt='%m/%d/%Y %H:%M:%S')
+logging.basicConfig(filename='/home/pi/Nido_IoT_'+datetime.now().strftime('%d-%m-%y.log'), filemode='a', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(script)s - %(message)s', datefmt='%m/%d/%Y %H:%M:%S')
 IP = " "
 			## Declaracion de funciones del script ##
 def get_ssid():
@@ -65,9 +67,9 @@ def get_datetime():
 
 				## Inicio del programa ##
 print "wifi ON"
-logging.debug('Wifi Connection started', extra=d)
+logging.info('Wifi Connection started', extra=d)
 reintentos = 0
-while SSID != mySSID or IP == myIP:
+while SSID != mySSID: ##or IP == myIP:
 	if reintentos < 10:
 		sleep(1)
 		SSID = get_ssid()
