@@ -1,3 +1,4 @@
+
 #! /bin/bash
 ##############################################################################################
 # File: video.sh
@@ -13,6 +14,6 @@
 DATE=$(date +"%d-%m-%Y")
 raspivid -t 15000 -w 640 -h 480 -o /home/pi/Documents/$DATE.h264
 
-MP4Box -add /home/pi/$DATE.h264 /home/pi/Documents/$DATE.mp4
+#MP4Box -add /home/pi/$DATE.h264 /home/pi/Documents/$DATE.mp4
 
-sudo rm /home/pi/Documents/$DATE.h264
+#sudo rm /home/pi/Documents/$DATE.h264

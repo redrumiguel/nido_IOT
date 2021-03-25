@@ -10,9 +10,10 @@
 import RPi.GPIO as GPIO
 import time
 import logging
+from datetime import datetime
 d = {'script':'servo.py'}
 
-logging.basicConfig(filename='/home/pi/Nido_IoT.log', filemode='a', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(script)s - %(message)s', datefmt='%m/%d/%Y %H:%M:%S')
+logging.basicConfig(filename='/home/pi/Nido_IoT_'+datetime.now().strftime('%d-%m-%y.log'), filemode='a', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(script)s - %(message)s', datefmt='%m/%d/%Y %H:%M:%S')
 
 
 PIN_ENA_SERVO = 6
@@ -34,22 +35,21 @@ def servo_init(pin_servo, pin_pwm):
 	GPIO.setwarnings(False)
 	GPIO.setup(pin_servo,GPIO.OUT)
 	GPIO.setup(pin_pwm,GPIO.OUT)
+	GPIO.output(pin_servo, GPIO.HIGH)
+	time.sleep(0.6)
+	p=GPIO.PWM(pin_pwm,50)# 50hz frequency
+        p.start(5)# starting duty cycle ( it set the servo to 0 degree 
+	time.sleep(1.9)
 	GPIO.output(pin_servo, GPIO.LOW)
-
-def release_trap(pin_servo, pin_pwm): 
+	return p
+def release_trap(pin_servo, pin_pwm, pwm, posicion): 
     try:
-	time.sleep(0.30)
         GPIO.output(pin_servo, GPIO.HIGH)
-        time.sleep(1)
-        p=GPIO.PWM(pin_pwm,50)# 50hz frequency
-        p.start(5)# starting duty cycle ( it set the servo to 0 degree )
-	time.sleep(1.5)
-        p.ChangeDutyCycle(10)
+        time.sleep(0.6)
+        pwm.ChangeDutyCycle(posicion)
 	logging.debug('Moving servo..', extra=d)
-        time.sleep(2)
+	time.sleep(1.9) 
         GPIO.output(pin_servo, GPIO.LOW)
     except KeyboardInterrupt:
         GPIO.cleanup()
 
-servo_init(PIN_ENA_SERVO,SERVO)
-release_trap(PIN_ENA_SERVO,SERVO)

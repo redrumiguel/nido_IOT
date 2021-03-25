@@ -214,33 +214,42 @@ while PROGRAMA_ACTIVO == True:
 					time.sleep(0.5)
 					eleciman_off(PIN_ENA_ELECIMAN)
 					#grabo video
-					infrared_on(PIN_ENA_INFRARED)
-					proc_record_video = subprocess.Popen(["raspivid", "-t", "10000","-w","640","-h","480","-o",id + "-" + fecha + "-"+ hora +".h264"], stdout=subprocess.PIPE)
-                                        proc_record_video.wait()
-					infrared_off(PIN_ENA_INFRARED)
-                                        print "viedo done"
+					#infrared_on(PIN_ENA_INFRARED)
+					#proc_record_video = subprocess.Popen(["raspivid", "-t", "10000","-w","640","-h","480","-o",id + "-" + fecha + "-"+ hora +".h264"], stdout=subprocess.PIPE)
+                                        #proc_record_video.wait()
+					#infrared_off(PIN_ENA_INFRARED)
+                                       # print "viedo done"
                                        # o = subprocess.Popen([""./video.sh"], stdout=subprocess.PIPE)
-                                        proc_set_cola = subprocess.Popen(["/home/pi/Documents/set_cola.py", id + "-" + fecha + "-"+ hora +".h264"], stdout=subprocess.PIPE)
-					proc_set_cola.wait()
-                                        print "set_cola done"
+                                       # proc_set_cola = subprocess.Popen(["/home/pi/Documents/set_cola.py", id + "-" + fecha + "-"+ hora +".h264"], stdout=subprocess.PIPE)
+					#proc_set_cola.wait()
+                                       # print "set_cola done"
 					#arranco wifi
 					PROGRAMA_ACTIVO = False
-#					proc_actWifi = subprocess.Popen(["/home/pi/actWifi.py"], stdout=subprocess.PIPE)
-#					proc_actWifi.wait()
-#                                        if proc_actWifi.returncode != 0:
-#                                        	print "No ha sido posible conectarse a la red"
-#                                        else:
+					proc_actWifi = subprocess.Popen(["/home/pi/actWifi.py"], stdout=subprocess.PIPE)
+					proc_actWifi.wait()
+                                        if proc_actWifi.returncode != 0:
+                                        	print "No ha sido posible conectarse a la red"
+                                        else:
                                         	#envio mail
-#                                                print "wifi activo"
-#                                                proc_mail = subprocess.Popen(["/home/pi/Documents/mail.py", NIDO, str(id)], stdout=subprocess.PIPE)
- #                                               proc_mail.wait()
+                                                print "wifi activo"
+                                                proc_mail = subprocess.Popen(["/home/pi/Documents/mail.py", NIDO, str(id)], stdout=subprocess.PIPE)
+                                                proc_mail.wait()
                                                 #apago wifi
-#                                                print "mail sent"
-#                                                proc_dis_wifi = subprocess.Popen(["/home/pi/desWifi.py"], stdout=subprocess.PIPE)
- #                                               proc_dis_wifi.wait()
-  #                                              print "des wifi" """
-				#else:
+                                                print "mail sent"
+                                                proc_dis_wifi = subprocess.Popen(["/home/pi/desWifi.py"], stdout=subprocess.PIPE)
+                                                proc_dis_wifi.wait()
+                                                print "des wifi"
+				else:
 					#otras acciones
+					#grabo video
+                                        infrared_on(PIN_ENA_INFRARED)
+                                        proc_record_video = subprocess.Popen(["raspivid", "-t", "60000","-w","640","-h","480","-o",id + "-" + fecha + "-"+ hora +".h264"], stdout=subprocess.PIPE)
+                                        proc_record_video.wait()
+                                        infrared_off(PIN_ENA_INFRARED)
+                                        print "viedo done"
+					proc_set_cola = subprocess.Popen(["/home/pi/Documents/set_cola.py", id + "-" + fecha + "-"+ hora +".h264"], stdout=subprocess.PIPE)
+                                        proc_set_cola.wait()
+                                        print "set_cola done"
 				time.sleep(0.3)
 				print "0b0011 piso segundo sw y entrando"
 				flagteiner = flagteiner & 0b1100

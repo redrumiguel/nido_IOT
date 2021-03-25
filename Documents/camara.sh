@@ -8,6 +8,5 @@
 #	       La imagen sera guardada con formato jpg y el nombre se compondra por la fecha.
 #	      
 ###############################################################################################
-DATE=$(date +"%d-%m-%y")
+DATE=$(date +"%d-%m-%y-%H:%M:%S")
 raspistill -o /home/pi/Documents/$DATE.jpg
-

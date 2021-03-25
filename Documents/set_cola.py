@@ -13,9 +13,11 @@
 import subprocess
 import sys
 import logging
+from datetime import datetime
+
 FORMATO = '%(asctime)s - %(levelname)s - %(script)s - %(message)s - %(file)s '
 d = {'script':'set_cola.py', 'file': sys.argv[1]}
-logging.basicConfig(filename='/home/pi/Nido_IoT.log', filemode='a', level=logging.DEBUG, format=FORMATO, datefmt='%m/%d/%Y %H:%M:%S')
+logging.basicConfig(filename='/home/pi/Nido_IoT_'+datetime.now().strftime('%d-%m-%y.log'), filemode='a', level=logging.DEBUG, format=FORMATO, datefmt='%m/%d/%Y %H:%M:%S')
 
 					### Definicion de funciones ###
 def grabar_file(name_file):

@@ -13,11 +13,13 @@
 #				  logs con las entradas y salidas recogidas (txt)
 ###############################################################################################
 cd Documents
-
+./soloON.py
 ./camara.sh
+./soloOFF.py
 DATE=$(date +"%d-%m-%y")
 DATE_T=$(date +"%d-%m-%Y")
-./set_cola.py $DATE.jpg
+#DATE_CAM=$(date +"%d-%m-%y-%H:%M:%S")
+find /home/pi/ -name '*.jpg' | while read a;do /home/pi/Documents/set_cola.py $(basename $a);done
 ./set_cola.py "temperaturas-"$DATE_T.txt
 ./set_cola.py "Movimientos_nido1-"$DATE.txt
 ./set_cola.py "Nido_IoT_"$DATE.log

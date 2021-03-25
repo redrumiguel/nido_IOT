@@ -15,11 +15,11 @@ PIN_SENSOR_TEMP_EXT2 = 7
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(PIN_SENSOR_TEMP_EXT2, GPIO.OUT)
 GPIO.setwarnings(False)
-GPIO.output(PIN_SENSOR_TEMP_EXT2, GPIO.HIGH)
-time.sleep(0.5)
 GPIO.output(PIN_SENSOR_TEMP_EXT2, GPIO.LOW)
+time.sleep(0.5)
+GPIO.output(PIN_SENSOR_TEMP_EXT2, GPIO.HIGH)
 time.sleep(6.5)
 tmp=subprocess.call ("./mido_tyh_wlog_ext")
-GPIO.output(PIN_SENSOR_TEMP_EXT2, GPIO.HIGH)
+GPIO.output(PIN_SENSOR_TEMP_EXT2, GPIO.LOW)
 
 					### Fin Script ###

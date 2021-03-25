@@ -12,13 +12,15 @@ Descripcion: Script que permite la sincronizacion de archivos encolados en un ch
 """
 import subprocess
 from datetime import date
+from datetime import datetime
 import time
 import sys
 import os.path
 from os import path
 import logging
+
 FORMATO = '%(asctime)s - %(levelname)s - %(script)s - %(message)s'
-logging.basicConfig(filename='/home/pi/Nido_IoT.log', filemode='a', level=logging.DEBUG, format=FORMATO, datefmt='%m/%d/%Y %H:%M:%S')
+logging.basicConfig(filename='/home/pi/Nido_IoT_'+datetime.now().strftime('%d-%m-%y.log'), filemode='a', level=logging.DEBUG, format=FORMATO, datefmt='%m/%d/%Y %H:%M:%S')
 
 					  ### Definicion de funciones ###
 def leer_file():

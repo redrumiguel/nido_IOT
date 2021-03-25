@@ -1,3 +1,4 @@
+#!/usr/bin/python
 """ 
 ################################################################################################################
 Fecha: 29-03-20
@@ -26,7 +27,7 @@ message = "Esta es una prueba de mail con identificacion de nido ["+sys.argv[1]+
 # setup the parameters of the message
 password = "#hwiot33"
 msg['From'] = "dtehwiot1@gmail.com"
-msg['To'] = "benson96@gmail.com"
+msg['To'] = "jeremiaco@gmail.com"
 msg['Subject'] = "prueba py"
  
 # add in the message body

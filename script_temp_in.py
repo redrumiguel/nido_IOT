@@ -19,13 +19,13 @@ def sensor_int_init(PIN_SENSOR_TEMP_INT):
 	GPIO.setmode(GPIO.BCM)
 	GPIO.setup(PIN_SENSOR_TEMP_INT, GPIO.OUT)
 	GPIO.setwarnings(False)
-	GPIO.output(PIN_SENSOR_TEMP_INT, GPIO.HIGH)
+	GPIO.output(PIN_SENSOR_TEMP_INT, GPIO.LOW)
 #time.sleep(0.5)
 def sensor_int_mide(PIN_SENSOR_TEMP_INT):
-	GPIO.output(PIN_SENSOR_TEMP_INT, GPIO.LOW)
-	time.sleep(1)
-	tmp=subprocess.call ("./mido_tyh_wlog_int")
 	GPIO.output(PIN_SENSOR_TEMP_INT, GPIO.HIGH)
+	time.sleep(3)
+	tmp=subprocess.call ("./mido_tyh_wlog_int")
+	GPIO.output(PIN_SENSOR_TEMP_INT, GPIO.LOW)
 sensor_int_init(PIN_SENSOR_TEMP_INT)
 sensor_int_mide(PIN_SENSOR_TEMP_INT)
 					### Fin Script ###
