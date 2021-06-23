@@ -99,36 +99,34 @@ void USCI_A0_ISR(void)
                   uart_A0_modo_rx = GET_ACCIONES;
               else if (RXData == SEND_TEMPERATURAS)
               {
-                  size_temp = pointer - FRAM_TEMP_START;
+                   size_temp = pointer - FRAM_TEMP_START;
+                   newTime = RTC_C_getCalendarTime(RTC_C_BASE);
 
-                  newTime = RTC_C_getCalendarTime(RTC_C_BASE);
+                   EUSCI_A_UART_transmitData(EUSCI_A0_BASE, (uint8_t) size_temp);
+                   EUSCI_A_UART_transmitData(EUSCI_A0_BASE, (uint8_t) (size_temp >> 8));
+                   while(EUSCI_A_UART_queryStatusFlags(EUSCI_A0_BASE,EUSCI_A_UART_BUSY)==EUSCI_A_UART_BUSY);
+                   EUSCI_A_UART_transmitData(EUSCI_A0_BASE, (uint8_t) newTime.DayOfMonth);
+                   EUSCI_A_UART_transmitData(EUSCI_A0_BASE, (uint8_t) newTime.Month);
+                   while(EUSCI_A_UART_queryStatusFlags(EUSCI_A0_BASE,EUSCI_A_UART_BUSY)==EUSCI_A_UART_BUSY);
+                   EUSCI_A_UART_transmitData(EUSCI_A0_BASE, (uint8_t) (newTime.Year >> 8));
+                   while(EUSCI_A_UART_queryStatusFlags(EUSCI_A0_BASE,EUSCI_A_UART_BUSY)==EUSCI_A_UART_BUSY);
 
-                  EUSCI_A_UART_transmitData(EUSCI_A0_BASE, (uint8_t) size_temp);
-                  EUSCI_A_UART_transmitData(EUSCI_A0_BASE, (uint8_t) (size_temp >> 8));
 
-                  EUSCI_A_UART_transmitData(EUSCI_A0_BASE, (uint8_t) newTime.DayOfMonth);
-                  EUSCI_A_UART_transmitData(EUSCI_A0_BASE, (uint8_t) newTime.Month);
-                  EUSCI_A_UART_transmitData(EUSCI_A0_BASE, (uint8_t) (newTime.Year >> 8));
-                  EUSCI_A_UART_transmitData(EUSCI_A0_BASE, (uint8_t) newTime.Year);
-
-                  EUSCI_A_UART_enableInterrupt(EUSCI_A0_BASE,
-                   EUSCI_A_UART_TRANSMIT_INTERRUPT);
-
-                  EUSCI_A_UART_clearInterrupt(EUSCI_A0_BASE,
+                   EUSCI_A_UART_enableInterrupt(EUSCI_A0_BASE,
                     EUSCI_A_UART_TRANSMIT_INTERRUPT);
-                  t = 0;
-                  uart_A0_modo_tx = SEND_TEMPERATURAS;
+
+                   EUSCI_A_UART_clearInterrupt(EUSCI_A0_BASE,
+                     EUSCI_A_UART_TRANSMIT_INTERRUPT);
+                   EUSCI_A_UART_transmitData(EUSCI_A0_BASE, (uint8_t) newTime.Year);
+
+                   t = 0;
+                   uart_A0_modo_tx = SEND_TEMPERATURAS;
+
               }
 
-              else
-                  size_mov = pointer - FRAM_MOV_START;
-
-                  newTime = RTC_C_getCalendarTime(RTC_C_BASE);
+              else if (RXData == SEND_MOVIMIENTOS){
+                  size_mov = pointer_mov - FRAM_MOV_START;
                   EUSCI_A_UART_transmitData(EUSCI_A0_BASE, (uint8_t) size_mov);
-                  EUSCI_A_UART_transmitData(EUSCI_A0_BASE, (uint8_t) newTime.DayOfMonth);
-                  EUSCI_A_UART_transmitData(EUSCI_A0_BASE, (uint8_t) newTime.Month);
-                  EUSCI_A_UART_transmitData(EUSCI_A0_BASE, (uint8_t) (newTime.Year >> 8));
-                  EUSCI_A_UART_transmitData(EUSCI_A0_BASE, (uint8_t) newTime.Year);
                   EUSCI_A_UART_enableInterrupt(EUSCI_A0_BASE,
                      EUSCI_A_UART_TRANSMIT_INTERRUPT);
 
@@ -136,7 +134,7 @@ void USCI_A0_ISR(void)
                       EUSCI_A_UART_TRANSMIT_INTERRUPT);
                   s = 0;
                   uart_A0_modo_tx = SEND_MOVIMIENTOS;
-
+              }
 
                 break;
 
@@ -144,6 +142,7 @@ void USCI_A0_ISR(void)
               if (i >= 8){
                  RTC_C_holdClock(RTC_C_BASE);
                  set_date_and_time(RXTrama,newTime);
+
                  RTC_C_startClock(RTC_C_BASE);
                  uart_A0_modo_rx = FIRST_BYTE;
           //       send_UART_data(COMMAND_SYNC);
@@ -180,30 +179,33 @@ void USCI_A0_ISR(void)
         switch (uart_A0_modo_tx)
         {
 
-        case SEND_TEMPERATURAS:
-        {
-            if (t < size_temp){
-               // valor[t] =  (uint16_t) (FRAM_TEMP_START+t);
-                EUSCI_A_UART_transmitData(EUSCI_A0_BASE, (uint8_t)*((uint16_t *)(FRAM_TEMP_START+t)));
-                t++;
-            }
-            else
-                uart_A0_modo_tx = FIRST_BYTE;
+            case SEND_TEMPERATURAS:
+
+                if (t < size_temp){
+                   // valor[t] =  (uint16_t) (FRAM_TEMP_START+t);
+                    EUSCI_A_UART_transmitData(EUSCI_A0_BASE, (uint8_t)*((uint16_t *)(FRAM_TEMP_START+t)));
+                    t++;
+                }
+                else{
+                    uart_A0_modo_rx = FIRST_BYTE;
+                    pointer = *(uint16_t *)FRAM_TEMP_START;
+                }
+
+                  break;
+
+            case SEND_MOVIMIENTOS:
+                if (s < size_temp){
+                   // valor[t] =  (uint16_t) (FRAM_TEMP_START+t);
+                    EUSCI_A_UART_transmitData(EUSCI_A0_BASE, (uint8_t)*((uint16_t *)(FRAM_MOV_START+t)));
+                    s++;
+                }
+                else{
+                    uart_A0_modo_rx = FIRST_BYTE;
+                    pointer = *(uint16_t *)FRAM_MOV_START;
+                }
 
 
-              break;
-        }
-        case SEND_MOVIMIENTOS:
-            if (s < size_mov){
-               // valor[t] =  (uint16_t) (FRAM_TEMP_START+t);
-                EUSCI_A_UART_transmitData(EUSCI_A0_BASE, (uint8_t)*((uint16_t *)(FRAM_MOV_START+t)));
-                s++;
-            }
-            else
-                uart_A0_modo_tx = FIRST_BYTE;
-
-
-              break;
+                  break;
 
         }
 
