@@ -97,7 +97,7 @@ hora = get_datetime()
 print "hora ="+hora[0]+" fecha= " +hora[1]
 
 try:
-        proc_set_hour = subprocess.Popen(["sudo","date","-s", hora[1] + "-" + hora[0]], stdout=subprocess.PIPE)
+        proc_set_hour = subprocess.Popen(["sudo","date","-s", hora[1] + "" + hora[0]], stdout=subprocess.PIPE)
         subprocess.Popen.wait(proc_set_hour)
         print "Completada actualizacion de hora"
         logging.debug('Date&Time updated', extra=d)
