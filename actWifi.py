@@ -74,14 +74,15 @@ def get_datetime():
 print "wifi ON"
 logging.info('Wifi Connection started', extra=d)
 proc_unblock_wlan0 = subprocess.Popen(["sudo","rfkill","unblock","0"], stdout=subprocess.PIPE)
-
+  
 proc_wlna_ena = subprocess.Popen(["sudo","ifconfig","wlan0","up"], stdout=subprocess.PIPE)
 reintentos = 0
 print get_ssid()
-while check_ssid(get_ssid()[0:len(get_ssid())-1]) == False:
-        if reintentos < 10:
-                sleep(1)
+while check_ssid(get_ssid()[0:len(get_ssid())-1]) == False or get_ssid() == "":
+        if reintentos < 20:
+                sleep(2)
                 reintentos = reintentos + 1
+		logging.warning("..", extra=d)
                 print "."
         else:
                 sys.exit(-1)
@@ -96,7 +97,7 @@ hora = get_datetime()
 print "hora ="+hora[0]+" fecha= " +hora[1]
 
 try:
-        proc_set_hour = subprocess.Popen(["sudo","date","--set=" + hora[0]], stdout=subprocess.PIPE)
+        proc_set_hour = subprocess.Popen(["sudo","date","-s", hora[1] + "-" + hora[0]], stdout=subprocess.PIPE)
         subprocess.Popen.wait(proc_set_hour)
         print "Completada actualizacion de hora"
         logging.debug('Date&Time updated', extra=d)
